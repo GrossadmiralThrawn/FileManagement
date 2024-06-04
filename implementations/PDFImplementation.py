@@ -1,8 +1,6 @@
-from PythonFileManagementInterfaces.STDFileInterface import STDFileInterface
 import pypdf
-import sys
 
-
+from PythonFileManagementInterfaces.STDFileInterface import STDFileInterface
 
 
 class PDFImplementation(STDFileInterface):
@@ -16,15 +14,9 @@ class PDFImplementation(STDFileInterface):
         self.filename = filename
         self.totalFile = path + filename
 
-
-
-
     def printData(self):
         print(self.path)
         print(self.filename)
-
-
-
 
     def setFile(self, filepath: str, fileName: str):
         pass
