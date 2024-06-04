@@ -39,3 +39,9 @@ if __name__ == '__main__':
 # Personalbogen_blanko.pdf
 # verbindliche_Anmeldung_Teamertreffen_2024.pdf
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+
+#Variante Laptop
+#C:\Users\lukas\Desktop\TestOrdner
+#Test.pdf
+#Test2.pdf
