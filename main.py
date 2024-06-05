@@ -31,7 +31,6 @@ if __name__ == '__main__':
     pfad = input("Pfad zur anzuhängende Datei: ")
     filename = input("Dateiname: ")
 
-
     pDFImplementation.appendFile(pfad, filename)
     print("Hallo Welt")
 
@@ -43,5 +42,5 @@ if __name__ == '__main__':
 
 #Variante Laptop
 #C:\Users\lukas\Desktop\TestOrdner
-#Test.pdf
-#Test2.pdf
+#\Test.pdf
+#\Test2.pdf
