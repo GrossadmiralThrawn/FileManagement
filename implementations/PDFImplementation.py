@@ -38,6 +38,10 @@ class PDFImplementation(STDFileInterface):
         for page in range(len(pdfReader.pages)):
             pdfWriter.add_page(pdfReader.pages[page])
 
+        if not filepath.endswith("\\") and not fileName.startswith("\\"):
+            filepath += "\\"
+
+
         additionalPdfPath = os.path.join(filepath, fileName)
         additionalPdfReader = pypdf.PdfReader(additionalPdfPath)
 
