@@ -4,12 +4,12 @@ import pypdf
 from PythonFileManagementInterfaces.STDFileInterface import STDFileInterface
 import os
 
-
-
 """
     Klasse die das STDFileInterface implementiert um 
     eine höhere Kompatibilität und Unabhängigkeit zu gewährleisten.
 """
+
+
 class PDFImplementation(STDFileInterface):
     def __init__(self):
         self.totalFile = None
@@ -27,8 +27,19 @@ class PDFImplementation(STDFileInterface):
         print(self.path)
         print(self.filename)
 
+    #Smart setter, which checks the primary Features of the given path.
     def setFile(self, filepath: str, fileName: str):
-        pass
+        if not filepath.endswith("\\") and not fileName.startswith():
+            filepath += "\\"
+            self.path = filepath
+            self.filename = fileName
+            self.totalFile = filepath + fileName
+            return
+        else:
+            self.path = filepath
+            self.filename = fileName
+            self.totalFile = filepath + fileName
+            return
 
     #append on file onto another
     def appendFile(self, filepath: str, fileName: str):
@@ -40,7 +51,6 @@ class PDFImplementation(STDFileInterface):
 
         if not filepath.endswith("\\") and not fileName.startswith("\\"):
             filepath += "\\"
-
 
         additionalPdfPath = os.path.join(filepath, fileName)
         additionalPdfReader = pypdf.PdfReader(additionalPdfPath)
