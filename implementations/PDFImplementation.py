@@ -18,27 +18,27 @@ class PDFImplementation(STDFileInterface):
 
     #default-Konnstruktor
     def initialize(self, path: str, filename: str):
-        self.path = path
-        self.filename = filename
-        self.totalFile = path + filename
+        self.setFile(path,  filename)
 
     #Prints the private data of the class
     def printData(self):
+        print(self)
         print(self.path)
         print(self.filename)
+        print(self.totalFile)
 
     #Smart setter, which checks the primary Features of the given path.
-    def setFile(self, filepath: str, fileName: str):
-        if not filepath.endswith("\\") and not fileName.startswith():
+    def setFile(self, filepath: str, filename: str):
+        if not filepath.endswith("\\") and not filename.startswith("\\"):
             filepath += "\\"
             self.path = filepath
-            self.filename = fileName
-            self.totalFile = filepath + fileName
+            self.filename = filename
+            self.totalFile = filepath + filename
             return
         else:
             self.path = filepath
-            self.filename = fileName
-            self.totalFile = filepath + fileName
+            self.filename = filename
+            self.totalFile = filepath + filename
             return
 
     #append on file onto another
