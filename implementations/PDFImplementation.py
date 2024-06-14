@@ -29,20 +29,24 @@ class PDFImplementation(STDFileInterface):
 
     #Smart setter, which checks the primary Features of the given path.
     def setFile(self, filepath: str, filename: str):
+        if not filename.endswith(".pdf"):
+            filename += ".pdf"
+
         if not filepath.endswith("\\") and not filename.startswith("\\"):
-            filepath += "\\"
-            self.path = filepath
-            self.filename = filename
-            self.totalFile = filepath + filename
+            filepath       += "\\"
+            self.path       = filepath
+            self.filename   = filename
+            self.totalFile  = filepath + filename
             return
         else:
-            self.path = filepath
-            self.filename = filename
+            self.path      = filepath
+            self.filename  = filename
             self.totalFile = filepath + filename
             return
 
+
     #append on file onto another
-    def appendFile(self, filepath: str, fileName: str):
+    def appendFile(self, filepath: str, fileName: str,):
         pdfWriter = pypdf.PdfWriter()
         pdfReader = pypdf.PdfReader(self.totalFile)
 
@@ -59,6 +63,32 @@ class PDFImplementation(STDFileInterface):
             pdfWriter.add_page(additionalPdfReader.pages[page])
 
         with open(self.totalFile, "wb") as output_file:
+            pdfWriter.write(output_file)
+
+
+
+    def mergeFile(self, filepath: str, fileName: str, outputPath:  str, outputName: str):
+        pdfWriter = pypdf.PdfWriter()
+        pdfReader = pypdf.PdfReader(self.totalFile)
+
+        for page in range(len(pdfReader.pages)):
+            pdfWriter.add_page(pdfReader.pages[page])
+
+        if not filepath.endswith("\\") and not fileName.startswith("\\"):
+            filepath += "\\"
+
+        additionalPdfPath = os.path.join(filepath, fileName)
+        additionalPdfReader = pypdf.PdfReader(additionalPdfPath)
+
+        for page in range(len(additionalPdfReader.pages)):
+            pdfWriter.add_page(additionalPdfReader.pages[page])
+
+        if not outputPath.endswith("\\") and not outputName.startswith("\\"):
+            outputPath += "\\"
+
+        outputFilePath = os.path.join(outputPath, outputName)
+
+        with open(outputFilePath, "wb") as output_file:
             pdfWriter.write(output_file)
 
     def deleteFile(filepath: str, fileName: str):

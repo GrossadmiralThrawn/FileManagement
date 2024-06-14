@@ -26,6 +26,11 @@ class STDFileInterface:
     def appendFile(self, filepath: str, fileName: str):
         pass
 
+
+    def mergeFile(self, filepath: str, fileName: str , outputPath:  str, outputName: str):
+        pass
+
+
     def mergeFiles(self, filepaths, output):
         pass
 
