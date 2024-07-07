@@ -4,14 +4,14 @@ class STDFileInterface:
         pass
 
     #Deletes a file given in the parameter.
-    def deleteExternFile(self, filepath: str, fileName: str):
+    def deleteExternalFile(self, filepath: str, fileName: str):
         pass
 
     #Deletes the file which ist stored locally
     def deleteFile(self):
         pass
 
-    #Returns the name of the File which ist stored into the class data
+    #Returns the name of the path and name of the file which ist stored into the class data
     def getFile(self):
         pass
 

@@ -1,13 +1,6 @@
 import pypdf
-
-#Interface-Implementierung
 from PythonFileManagementInterfaces.STDFileInterface import STDFileInterface
 import os
-
-"""
-    Klasse die das STDFileInterface implementiert um 
-    eine höhere Kompatibilität und Unabhängigkeit zu gewährleisten.
-"""
 
 
 class PDFImplementation(STDFileInterface):
@@ -16,45 +9,29 @@ class PDFImplementation(STDFileInterface):
         self.filename = None
         self.path = None
 
-    #default-Konnstruktor
     def initialize(self, path: str, filename: str):
-        self.setFile(path,  filename)
+        self.setFile(path, filename)
 
-    #Prints the private data of the class
     def printData(self):
-        print(self)
-        print(self.path)
-        print(self.filename)
-        print(self.totalFile)
+        print(f"Path: {self.path}, Filename: {self.filename}, Total File: {self.totalFile}")
 
-    #Smart setter, which checks the primary Features of the given path.
     def setFile(self, filepath: str, filename: str):
         if not filename.endswith(".pdf"):
             filename += ".pdf"
 
-        if not filepath.endswith("\\") and not filename.startswith("\\"):
-            filepath       += "\\"
-            self.path       = filepath
-            self.filename   = filename
-            self.totalFile  = filepath + filename
-            return
-        else:
-            self.path      = filepath
-            self.filename  = filename
-            self.totalFile = filepath + filename
-            return
+        self.path = filepath
+        self.filename = filename
+        self.totalFile = os.path.join(filepath, filename)
 
+    def getFile(self):
+        return self.totalFile
 
-    #append on file onto another
-    def appendFile(self, filepath: str, fileName: str,):
+    def appendFile(self, filepath: str, fileName: str):
         pdfWriter = pypdf.PdfWriter()
         pdfReader = pypdf.PdfReader(self.totalFile)
 
         for page in range(len(pdfReader.pages)):
             pdfWriter.add_page(pdfReader.pages[page])
-
-        if not filepath.endswith("\\") and not fileName.startswith("\\"):
-            filepath += "\\"
 
         additionalPdfPath = os.path.join(filepath, fileName)
         additionalPdfReader = pypdf.PdfReader(additionalPdfPath)
@@ -65,17 +42,12 @@ class PDFImplementation(STDFileInterface):
         with open(self.totalFile, "wb") as output_file:
             pdfWriter.write(output_file)
 
-
-
-    def mergeFile(self, filepath: str, fileName: str, outputPath:  str, outputName: str):
+    def mergeFile(self, filepath: str, fileName: str, outputPath: str, outputName: str):
         pdfWriter = pypdf.PdfWriter()
         pdfReader = pypdf.PdfReader(self.totalFile)
 
         for page in range(len(pdfReader.pages)):
             pdfWriter.add_page(pdfReader.pages[page])
-
-        if not filepath.endswith("\\") and not fileName.startswith("\\"):
-            filepath += "\\"
 
         additionalPdfPath = os.path.join(filepath, fileName)
         additionalPdfReader = pypdf.PdfReader(additionalPdfPath)
@@ -83,13 +55,91 @@ class PDFImplementation(STDFileInterface):
         for page in range(len(additionalPdfReader.pages)):
             pdfWriter.add_page(additionalPdfReader.pages[page])
 
-        if not outputPath.endswith("\\") and not outputName.startswith("\\"):
-            outputPath += "\\"
+        outputFilePath = os.path.join(outputPath, outputName)
+
+        with open(outputFilePath, "wb") as output_file:
+            pdfWriter.write(output_file)
+
+    def mergeFiles(self, filepaths, outputPath: str, outputName: str):
+        pdfWriter = pypdf.PdfWriter()
+
+        for filepath in filepaths:
+            pdfReader = pypdf.PdfReader(filepath)
+            for page in range(len(pdfReader.pages)):
+                pdfWriter.add_page(pdfReader.pages[page])
 
         outputFilePath = os.path.join(outputPath, outputName)
 
         with open(outputFilePath, "wb") as output_file:
             pdfWriter.write(output_file)
 
-    def deleteFile(filepath: str, fileName: str):
-        pass
+    def searchFile(self, filepath: str, fileName: str):
+        if not fileName.endswith(".pdf"):
+            fileName += ".pdf"
+        return os.path.exists(os.path.join(filepath, fileName))
+
+    def mergeFilesWithoutInternalFile(self, filepaths, outputPath: str, outputName: str):
+        pdfWriter = pypdf.PdfWriter()
+
+        for filepath in filepaths:
+            pdfReader = pypdf.PdfReader(filepath)
+            for page in range(len(pdfReader.pages)):
+                pdfWriter.add_page(pdfReader.pages[page])
+
+        outputFilePath = os.path.join(outputPath, outputName)
+
+        with open(outputFilePath, "wb") as output_file:
+            pdfWriter.write(output_file)
+
+    def deleteFile(self, filepath: str, fileName: str):
+        if not fileName.endswith(".pdf"):
+            fileName += ".pdf"
+        file_to_delete = os.path.join(filepath, fileName)
+        if os.path.exists(file_to_delete):
+            os.remove(file_to_delete)
+            return True
+        return False
+
+    def deleteExternalFile(self, filepath: str, fileName: str):
+        return self.deleteFile(filepath, fileName)
+
+    def splitFile(self, position: int):
+        pdfReader = pypdf.PdfReader(self.totalFile)
+        pdfWriter1 = pypdf.PdfWriter()
+        pdfWriter2 = pypdf.PdfWriter()
+
+        for page in range(position):
+            pdfWriter1.add_page(pdfReader.pages[page])
+
+        for page in range(position, len(pdfReader.pages)):
+            pdfWriter2.add_page(pdfReader.pages[page])
+
+        base, ext = os.path.splitext(self.totalFile)
+        part1 = f"{base}_part1{ext}"
+        part2 = f"{base}_part2{ext}"
+
+        with open(part1, "wb") as output_file1:
+            pdfWriter1.write(output_file1)
+        with open(part2, "wb") as output_file2:
+            pdfWriter2.write(output_file2)
+
+    def splitExternFile(self, filepath: str, fileName: str, position: int, nameNewFile: str):
+        if not fileName.endswith(".pdf"):
+            fileName += ".pdf"
+        file_to_split = os.path.join(filepath, fileName)
+
+        pdfReader = pypdf.PdfReader(file_to_split)
+        pdfWriter = pypdf.PdfWriter()
+
+        for page in range(position, len(pdfReader.pages)):
+            pdfWriter.add_page(pdfReader.pages[page])
+
+        new_file_path = os.path.join(filepath, nameNewFile)
+
+        with open(new_file_path, "wb") as output_file:
+            pdfWriter.write(output_file)
+
+    def appendFileNameIncluded(self, filepath: str):
+        fileName = os.path.basename(filepath)
+        dirPath = os.path.dirname(filepath)
+        self.appendFile(dirPath, fileName)
