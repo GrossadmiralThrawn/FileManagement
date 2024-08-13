@@ -3,8 +3,11 @@
 # Press Umschalt+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-import implementations.PDFImplementation
 import PythonFileManagementInterfaces.STDFileInterface
+from PythonFileManagementInterfaces.STDFileInterface import STDFileInterface
+from implementations.PDFImplementation import PDFImplementation
+
+alreadyinitialized = False
 
 
 def print_hi(name):
@@ -14,7 +17,7 @@ def print_hi(name):
 
 def wellBeing():
     response = input("Wie geht es dir?\n")
-    if ((response.__contains__("Gut") or response.__contains__("gut")) and not (
+    if ((response.__contains__("Gut") or response.__contains__("gut") or response.__contains__("besser")) and not (
             response.__contains__("Nicht") or response.__contains__("nicht"))):
         print("Schön zu hören. :)")
     else:
@@ -36,26 +39,49 @@ def appendInteraction(stdFileInterface: PythonFileManagementInterfaces.STDFileIn
     stdFileInterface.appendFile(pfad, filename)
 
 
+def initialize(type: str):
+    if type.__contains__("PDFImplementation"):
+        basepath = input("Wo liegt die Datei mit der das verarbeitende Objekt initialisiert werden soll?\n")
+        basefile: str = input("Wie heißt die Datei, welche zur Objektinitialisierung verwendet werden solL?\n")
+        return PDFImplementation(basepath, basefile)
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    pDFImplementation = implementations.PDFImplementation.PDFImplementation()
-
+    sTDFileInterface = STDFileInterface()
 
     print_hi('Lukas')
     wellBeing()
 
 
-    pfad = input("Dateipfad: ")
-    filename = input("Dateiname: ")
-    pDFImplementation.initialize(pfad, filename)
 
+    selectFileType = input("Möchtest du mit PDFs arbeiten? \nYes or no: y/ n\n")
 
-    pfad = input("Dateipfad: ")
-    filename = input("Dateiname: ")
-    targetPath = input("Target Path: ")
-    targetName = input("Target Name: ")
+    if selectFileType == "y":
+        sTDFileInterface = initialize("PDFImplementation")
+    else:
+        print("Leider steht aktuell noch keine weitere Implementierung zur Verfügung. Deswegen kann ich dir leider gerade nicht helfen. Ich schalte mich jetzt ab, aktiviere mich"
+              "aber gerne wieder, wenn ich dir helfen kann. Ich wünsche dir noch eine schöne und gute Zeit und bis zum nächsten Mal. :)\n")
 
-    pDFImplementation.mergeFile(pfad, filename, targetPath, targetName)
+    while (True):
+        print("Du hast folgende Möglichkeiten:")
+        print()
+        print("1: Zwei PDFs mergen")
+        print("2: Mehrere PDFs mergen")
+        print("3: Mehrere PDFs mergen, aber ohne die Objektinitialisierungsdatei.")
+        print("0: Programm beenden.")
+
+        userInput = input()
+        if (userInput == "1"):
+            filepath = input("Dateipfad: ")
+            filename = input("Dateiname: ")
+            outputname = input("Wie soll die ausgegebene Datei heißen? ")
+            sTDFileInterface.mergeFile(filepath, filename, "C:\\Users\\Lukas\\Pictures\\Screenshots", outputname)
+        if (userInput == "2"):
+            pass
+        if (userInput == "3"):
+            pass
+        if (userInput == "0"):
+            break
 
     print("Bis zum nächsten Mal. :)")
 

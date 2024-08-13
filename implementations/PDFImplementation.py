@@ -4,10 +4,9 @@ import os
 
 
 class PDFImplementation(STDFileInterface):
-    def __init__(self):
-        self.totalFile = None
-        self.filename = None
-        self.path = None
+    def __init__(self, path: str, filename: str):
+        self.setFile(path, filename)
+
 
     def initialize(self, path: str, filename: str):
         self.setFile(path, filename)
@@ -42,25 +41,56 @@ class PDFImplementation(STDFileInterface):
         with open(self.totalFile, "wb") as output_file:
             pdfWriter.write(output_file)
 
-    def mergeFile(self, filepath: str, fileName: str, outputPath: str, outputName: str):
+    def mergeFile(self, filepath: str, fileName: str = None, outputPath: str = None, outputName: str = None):
         pdfWriter = pypdf.PdfWriter()
+
+        # Prüfe, ob die Initialdatei existiert
+        if not os.path.exists(self.totalFile):
+            print(f"Fehler: Die Datei {self.totalFile} existiert nicht.")
+            return
+
         pdfReader = pypdf.PdfReader(self.totalFile)
 
         for page in range(len(pdfReader.pages)):
             pdfWriter.add_page(pdfReader.pages[page])
 
+        # Wenn kein Dateiname angegeben ist, benutze den Dateinamen der Initialdatei
+        if fileName is None:
+            fileName = os.path.basename(self.totalFile)
+
+        # Wenn kein Verzeichnispfad angegeben ist, benutze das Verzeichnis der Initialdatei
+        if filepath is None:
+            filepath = self.path
+
         additionalPdfPath = os.path.join(filepath, fileName)
+
+        # Prüfe, ob die zusätzliche Datei existiert
+        if not os.path.exists(additionalPdfPath):
+            print(f"Fehler: Die Datei {additionalPdfPath} existiert nicht.")
+            return
+
         additionalPdfReader = pypdf.PdfReader(additionalPdfPath)
 
         for page in range(len(additionalPdfReader.pages)):
             pdfWriter.add_page(additionalPdfReader.pages[page])
 
+        # Wenn kein Ausgabepfad angegeben ist, benutze das Verzeichnis der Initialdatei
+        if outputPath is None:
+            outputPath = self.path
+
+        # Wenn kein Ausgabename angegeben ist, benutze den Namen "merged_output.pdf"
+        if outputName is None:
+            outputName = "merged_output.pdf"
+
         outputFilePath = os.path.join(outputPath, outputName)
 
         with open(outputFilePath, "wb") as output_file:
             pdfWriter.write(output_file)
-
     def mergeFiles(self, filepaths, outputPath: str, outputName: str):
+        # Füge self.totalFil zu filepaths hinzu
+        if self.totalFile is not None:
+            filepaths.append(self.totalFile)
+
         pdfWriter = pypdf.PdfWriter()
 
         for filepath in filepaths:
