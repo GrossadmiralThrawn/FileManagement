@@ -1,89 +1,143 @@
-import PythonFileManagementInterfaces.STDFileInterface
+import os
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from tkinter import ttk
 from implementations.PDFImplementation import PDFImplementation
 
 
-def print_hi(name):
-    print(f'Hi, {name}.')
+class PDFApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("PDF Management")
+        self.geometry("500x400")  # Fenstergröße
+        self.sTDFileInterface = None
 
+        # Start with the Wellbeing view
+        self.show_wellbeing_view()
 
-def wellBeing():
-    response = input("Wie geht es dir?\n")
-    if ("gut" in response.lower() or "besser" in response.lower()) and "nicht" not in response.lower():
-        print("Schön zu hören. :)")
-    else:
-        print("Das tut mir leid. Ich hoffe es geht dir bald wieder besser. ")
+    def show_wellbeing_view(self):
+        for widget in self.winfo_children():
+            widget.destroy()
 
-    if "und dir" in response.lower() or "und selbst" in response.lower():
-        print("Mir geht es gut, danke. :)")
+        frame = tk.Frame(self)
+        frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=(150, 20))  # Verschieben nach unten
 
+        tk.Label(frame, text="Wie geht es dir?").pack(pady=20)
 
-def appendInteraction(stdFileInterface: PythonFileManagementInterfaces.STDFileInterface):
-    pfad = input("Pfad zur anzuhängenden Datei: ")
-    filename = input("Dateiname: ")
-    stdFileInterface.appendFile(pfad, filename)
+        button_frame = tk.Frame(frame)
+        button_frame.pack(pady=20)
 
+        tk.Button(button_frame, text="Gut", command=self.on_good).pack(side=tk.LEFT, padx=20)
+        tk.Button(button_frame, text="Schlecht", command=self.on_bad).pack(side=tk.RIGHT, padx=20)
 
-def initialize(type: str):
-    if type == "PDFImplementation":
-        basepath = input("Wo liegt die Datei mit der das verarbeitende Objekt initialisiert werden soll?\n")
-        basefile = input("Wie heißt die Datei, welche zur Objektinitialisierung verwendet werden soll?\n")
-        return PDFImplementation(basepath, basefile)
+    def on_good(self):
+        messagebox.showinfo("Schön zu hören", "Schön zu hören. :)")
+        self.show_file_selection_view()
 
+    def on_bad(self):
+        messagebox.showinfo("Das tut mir leid", "Das tut mir leid. Ich hoffe es geht dir bald wieder besser.")
+        self.show_file_selection_view()
 
-if __name__ == '__main__':
-    print_hi('Lukas')
-    wellBeing()
+    def show_file_selection_view(self):
+        for widget in self.winfo_children():
+            widget.destroy()
 
-    sTDFileInterface = None
+        frame = tk.Frame(self)
+        frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=(150, 20))  # Verschieben nach unten
 
-    selectFileType = input("Möchtest du mit PDFs arbeiten? \nYes or no: y/ n\n")
+        tk.Label(frame, text="Bitte wähle eine Option:").pack(pady=10)
 
-    if selectFileType.lower() == "y":
-        sTDFileInterface = initialize("PDFImplementation")
-    else:
-        print("Leider steht aktuell noch keine weitere Implementierung zur Verfügung. "
-              "Ich wünsche dir noch eine schöne und gute Zeit und bis zum nächsten Mal. :)")
-        exit()
+        self.option = tk.StringVar()
+        self.option.set("1: Zwei PDFs mergen")
 
-    while True:
-        print("\nDu hast folgende Möglichkeiten:")
-        print("1: Zwei PDFs mergen")
-        print("2: Mehrere PDFs mergen")
-        print("3: Mehrere PDFs mergen, aber ohne die Objektinitialisierungsdatei.")
-        print("0: Programm beenden.")
+        options = [
+            "1: Zwei PDFs mergen",
+            "2: Mehrere PDFs mergen",
+            "3: Mehrere PDFs mergen, aber ohne die Objektinitialisierungsdatei."
+        ]
 
-        userInput = input("Bitte wähle eine Option: ")
+        ttk.OptionMenu(frame, self.option, *options).pack(pady=10)
 
-        if userInput == "1":
-            filepath = input("Dateipfad: ")
-            filename = input("Dateiname: ")
-            newFilePosition = input("Wo soll die neue Datei liegen? ")
-            outputname = input("Wie soll die ausgegebene Datei heißen? ")
-            sTDFileInterface.mergeFile(filepath, filename, newFilePosition, outputname)
+        tk.Button(frame, text="Weiter", command=self.on_next).pack(pady=20)
 
-        elif userInput == "2":
-            print("Option zum Merger mehrerer PDFs noch nicht implementiert.")
-            pass  # Future implementation for merging multiple PDFs
+    def on_next(self):
+        selected_option = self.option.get()
 
-        elif userInput == "3":
-            print("Option zum Merger mehrerer PDFs ohne Initialisierungsdatei noch nicht implementiert.")
-            pass  # Future implementation for merging multiple PDFs without the initialization file
-
-        elif userInput == "0":
-            print("Bis zum nächsten Mal. :)")
-            break
-
+        if selected_option.startswith("1"):
+            self.merge_two_pdfs_view()
+        elif selected_option.startswith("2") or selected_option.startswith("3"):
+            messagebox.showinfo("Noch nicht implementiert", "Diese Option ist noch nicht implementiert.")
         else:
-            print("Ungültige Auswahl, bitte versuche es erneut.")
-# C:\Users\Lukas\Pictures\Screenshots
-# Personalbogen_blanko.pdf
-# verbindliche_Anmeldung_Teamertreffen_2024.pdf
-# C:\Users\Lukas\Desktop\SP2024-G4-Kinobetreiber
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+            self.quit()
+
+    def merge_two_pdfs_view(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        frame = tk.Frame(self)
+        frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=(150, 20))  # Verschieben nach unten
+
+        tk.Label(frame, text="Datei 1 auswählen:").pack(pady=5)
+        self.file1_path = tk.Entry(frame, width=50)
+        self.file1_path.pack(pady=5)
+        tk.Button(frame, text="Durchsuchen", command=self.select_file1).pack(pady=5)
+
+        tk.Label(frame, text="Datei 2 auswählen:").pack(pady=5)
+        self.file2_path = tk.Entry(frame, width=50)
+        self.file2_path.pack(pady=5)
+        tk.Button(frame, text="Durchsuchen", command=self.select_file2).pack(pady=5)
+
+        tk.Label(frame, text="Speicherort auswählen:").pack(pady=5)
+        self.save_path = tk.Entry(frame, width=50)
+        self.save_path.pack(pady=5)
+        tk.Button(frame, text="Durchsuchen", command=self.select_save_path).pack(pady=5)
+
+        tk.Label(frame, text="Ausgabedatei-Name:").pack(pady=5)
+        self.output_name = tk.Entry(frame, width=50)
+        self.output_name.pack(pady=5)
+
+        button_frame = tk.Frame(frame)
+        button_frame.pack(pady=20)
+
+        tk.Button(button_frame, text="Merge PDFs", command=self.merge_pdfs).pack(side=tk.LEFT, padx=10)
+        tk.Button(button_frame, text="Zurück", command=self.show_file_selection_view).pack(side=tk.RIGHT, padx=10)
+
+    def select_file1(self):
+        self.file1_path.delete(0, tk.END)
+        self.file1_path.insert(0, filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")]))
+
+    def select_file2(self):
+        self.file2_path.delete(0, tk.END)
+        self.file2_path.insert(0, filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")]))
+
+    def select_save_path(self):
+        self.save_path.delete(0, tk.END)
+        self.save_path.insert(0, filedialog.askdirectory())
+
+    def merge_pdfs(self):
+        file1 = self.file1_path.get()
+        file2 = self.file2_path.get()
+        save_dir = self.save_path.get()
+        output_name = self.output_name.get()
+
+        if not all([file1, file2, save_dir, output_name]):
+            messagebox.showerror("Fehler", "Bitte füllen Sie alle Felder aus.")
+            return
+
+        # Initialisiere die PDFImplementation und merge die Dateien
+        self.sTDFileInterface = PDFImplementation(os.path.dirname(file1), os.path.basename(file1))
+        self.sTDFileInterface.mergeFile(os.path.dirname(file2), os.path.basename(file2), save_dir, output_name)
+
+        messagebox.showinfo("Erfolg", "Die Dateien wurden erfolgreich gemerged.")
+        self.clear_fields()
+
+    def clear_fields(self):
+        self.file1_path.delete(0, tk.END)
+        self.file2_path.delete(0, tk.END)
+        self.save_path.delete(0, tk.END)
+        self.output_name.delete(0, tk.END)
 
 
-#Variante Laptop
-#C:\Users\lukas\Desktop\TestOrdner
-#\Test.pdf
-#\Test2.pdf
-#C:\Users\Lukas\Downloads
+if __name__ == "__main__":
+    app = PDFApp()
+    app.mainloop()
