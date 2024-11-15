@@ -56,7 +56,12 @@ class PDFApp(tk.Tk):
             "3: Mehrere PDFs mergen, aber ohne die Objektinitialisierungsdatei."
         ]
 
-        ttk.OptionMenu(frame, self.option, *options).pack(pady=10)
+        # OptionMenu wird sauber neu erstellt
+        if hasattr(self, "option_menu"):
+            self.option_menu.destroy()
+
+        self.option_menu = ttk.OptionMenu(frame, self.option, options[0], *options)
+        self.option_menu.pack(pady=10)
 
         tk.Button(frame, text="Weiter", command=self.on_next).pack(pady=20)
 
@@ -65,8 +70,12 @@ class PDFApp(tk.Tk):
 
         if selected_option.startswith("1"):
             self.merge_two_pdfs_view()
-        elif selected_option.startswith("2") or selected_option.startswith("3"):
-            messagebox.showinfo("Noch nicht implementiert", "Diese Option ist noch nicht implementiert.")
+        elif selected_option.startswith("2"):
+            messagebox.showinfo("Noch nicht implementiert", "Option 2: Mehrere PDFs mergen ist noch nicht implementiert.")
+            self.show_file_selection_view()
+        elif selected_option.startswith("3"):
+            messagebox.showinfo("Noch nicht implementiert", "Option 3: Mehrere PDFs ohne Init-Datei ist noch nicht implementiert.")
+            self.show_file_selection_view()
         else:
             self.quit()
 

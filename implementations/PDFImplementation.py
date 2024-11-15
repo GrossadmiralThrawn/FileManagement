@@ -1,7 +1,5 @@
 import os
-
 import pypdf
-
 from PythonFileManagementInterfaces.STDFileInterface import STDFileInterface
 
 
